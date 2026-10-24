@@ -1,0 +1,35 @@
+---
+- name: Despliegue y Configuracion de Servidor Web Nginx
+  hosts: webservers
+  become: true
+  vars:
+    app_title: "Ansible Demo - Gestion de la Configuracion"
+    app_version: "1.0.0"
+
+  tasks:
+    - name: 1. Instalar servidor web Nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+
+    - name: 2. Desplegar sitio web personalizado desde plantilla Jinja2
+      template:
+        src: templates/index.html.j2
+        dest: /var/www/html/index.html
+        owner: www-data
+        group: www-data
+        mode: "0644"
+      notify: Reiniciar Nginx
+
+    - name: 3. Asegurar que el servicio Nginx este activo y habilitado
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+
+  handlers:
+    - name: Reiniciar Nginx
+      service:
+        name: nginx
+        state: restarted

@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ansible: Automatización e Infraestructura como Código</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        ansible: {
+                            red: '#EE0000',
+                            dark: '#151515',
+                            card: '#1E1E1E',
+                            accent: '#FF4D4D',
+                            border: '#333333'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts & Font Awesome icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #121212;
+            color: #E0E0E0;
+            overflow: hidden;
+        }
+        .slide {
+            display: none;
+            height: calc(100vh - 80px);
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .slide.active {
+            display: flex;
+            opacity: 1;
+        }
+        .code-block {
+            font-family: 'Fira Code', monospace;
+            background-color: #0A0A0A;
+            border-left: 4px solid #EE0000;
+        }
+        .slide-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        .slide-content::-webkit-scrollbar-track {
+            background: #1E1E1E;
+        }
+        .slide-content::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen justify-between select-none">
+
+    <!-- Top Navigation Header -->
+    <header class="h-14 bg-ansible-dark border-b border-ansible-border px-6 flex items-center justify-between text-sm">
+        <div class="flex items-center space-x-3">
+            <i class="fa-solid fa-square-poll-vertical text-ansible-red text-xl"></i>
+            <span class="font-bold text-white tracking-wide">ANSIBLE</span>
+            <span class="text-xs bg-ansible-red/20 text-ansible-accent px-2 py-0.5 rounded border border-ansible-red/30">Infraestructura como Código</span>
+        </div>
+        <div class="text-xs text-gray-400">
+            Diapositiva <span id="current-slide" class="text-white font-bold">1</span> de <span id="total-slides">14</span>
+        </div>
+    </header>
+
+    <!-- Main Slide Container -->
+    <main class="flex-1 relative overflow-hidden bg-gradient-to-br from-ansible-dark via-[#181818] to-black">
+
+        <!-- SLIDE 1: PORTADA -->
+        <section class="slide active flex-col items-center justify-center p-8 text-center">
+            <div class="max-w-4xl space-y-6">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-ansible-red/10 border border-ansible-red/40 text-ansible-accent text-sm font-semibold mb-2">
+                    <i class="fa-solid fa-microchip"></i> Automatización & Cloud Native Ecosystem
+                </div>
+                <h1 class="text-5xl md:text-6xl font-extrabold text-white tracking-tight leading-tight">
+                    Ansible: Infraestructura como Código y Automatización IT
+                </h1>
+                <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+                    Gestión de configuración, aprovisionamiento y orquestación agentless para arquitecturas modernas.
+                </p>
+            </div>
+        </section>
+
+        <!-- SLIDE 2: PROBLEMA QUE RESUELVE -->
+        <section class="slide flex-col p-8 overflow-y-auto slide-content">
+            <h2 class="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+                <i class="fa-solid fa-triangle-exclamation text-ansible-red"></i> 1. ¿Qué problema resuelve Ansible?
+            </h2>
+            <p class="text-gray-400 text-sm mb-6">Desafíos en la gestión tradicional de infraestructura y operaciones IT</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-auto">
+                <div class="bg-ansible-card p-6 rounded-xl border border-ansible-border hover:border-ansible-red/50 transition">
+                    <div class="text-ansible-accent text-2xl mb-3"><i class="fa-solid fa-hand-holding-hand"></i></div>
+                    <h3 class="text-lg font-bold text-white mb-2">Gestión Manual & Error Humano</h3>
+                    <p class="text-sm text-gray-300">Configurar servidores individualmente mediante scripts SSH manuales es propenso a equivocaciones, lento e ineficiente a escala.</p>
+                </div>
+                <div class="bg-ansible-card p-6 rounded-xl border border-ansible-border hover:border-ansible-red/50 transition">
+                    <div class="text-ansible-accent text-2xl mb-3"><i class="fa-solid fa-shuffle"></i></div>
+                    <h3 class="text-lg font-bold text-white mb-2">Configuration Drift (Desviación)</h3>
+                    <p class="text-sm text-gray-300">Con el tiempo, los entornos (dev, staging, prod) pierden paridad debido a parches manuales no documentados, generando fallos en producción.</p>
+                </div>
+                <div class="bg-ansible-card p-6 rounded-xl border border-ansible-border hover:border-ansible-red/50 transition">
+                    <div class="text-ansible-accent text-2xl mb-3"><i class="fa-solid fa-rotate-right"></i></div>
+                    <h3 class="text-lg font-bold text-white mb-2">Falta de Repetibilidad</h3>
+                    <p class="text-sm text-gray-300">Dificultad para recrear infraestructura destruida o desplegar nuevos nodos idénticos en cuestión de minutos.</p>
+                </div>
+                <div class="bg-ansible-card p-6 rounded-xl border border-ansible-border hover:border-ansible-red/50 transition">
+                    <div class="text-ansible-accent text-2xl mb-3"><i class="fa-solid fa-hourglass-half"></i></div>
+                    <h3 class="text-lg font-bold text-white mb-2">Cuellos de Botella Operativos</h3>
+                    <p class="text-sm text-gray-300">Los equipos de desarrollo dependen del equipo de SysAdmins/Ops para cada cambio menor o aprovisionamiento de recursos.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: EXPLICACIÓN DE LA HERRAMIENTA Y COMPONENTES -->
+        <section class="slide flex-col p-8 overflow-y-auto slide-content">
+            <h2 class="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+                <i class="fa-solid fa-cubes text-ansible-red"></i> 2. Explicación de la Herramienta
+            </h2>
+            <p class="text-gray-400 text-sm mb-6">Naturaleza, licenciamiento y arquitectura interna de Ansible</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="bg-ansible-card p-5 rounded-xl border border-ansible-border">
+                    <h3 class="text-ansible-accent font-bold mb-2 text-sm uppercase tracking-wider">¿Qué es?</h3>
+                    <p class="text-xs text-gray-300 leading-relaxed">Una plataforma de automatización IT de código abierto para gestión de configuración, despliegue de aplicaciones y aprovisionamiento de infraestructura.</p>
+                </div>
+                <div class="bg-ansible-card p-5 rounded-xl border border-ansible-border">
+                    <h3 class="text-ansible-accent font-bold mb-2 text-sm uppercase tracking-wider">Ecosistema & Soporte</h3>
+                    <p class="text-xs text-gray-300 leading-relaxed">Mantenida por <strong>Red Hat (IBM)</strong>. Amplia comunidad global con Ansible Galaxy (repositorio público de roles y colecciones).</p>
+                </div>
+                <div class="bg-ansible-card p-5 rounded-xl border border-ansible-border">
+                    <h3 class="text-ansible-accent font-bold mb-2 text-sm uppercase tracking-wider">Licenciamiento</h3>
+                    <p class="text-xs text-gray-300 leading-relaxed"><strong>Open Source (GPLv3)</strong> para Ansible Core/Community. Versión Enterprise: <strong>Red Hat Ansible Automation Platform (AAP)</strong>.</p>
+                </div>
+            </div>
+
+            <h3 class="text-lg font-bold text-white mb-3">Componentes Principales</h3>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div class="bg-black/40 p-3 rounded-lg border border-ansible-border">
+                    <span class="text-xs font-bold text-ansible-accent block mb-1">Playbooks</span>
+                    <span class="text-xs text-gray-400">Archivos YAML que definen el estado deseado mediante tareas declarativas.</span>
+                </div>
+                <div class="bg-black/40 p-3 rounded-lg border border-ansible-border">
+                    <span class="text-xs font-bold text-ansible-accent block mb-1">Inventory</span>
+                    <span class="text-xs text-gray-400">Lista de servidores objetivos (estáticos o dinámicos via AWS/GCP).</span>
+                </div>
+                <div class="bg-black/40 p-3 rounded-lg border border-ansible-border">
+                    <span class="text-xs font-bold text-ansible-accent block mb-1">Modules</span>
+                    <span class="text-xs text-gray-400">Unidades de código en Python ejecutadas en los nodos de destino (apt, yum, docker, copy).</span>
+                </div>
+                <div class="bg-black/40 p-3 rounded-lg border border-ansible-border">
+                    <span class="text-xs font-bold text-ansible-accent block mb-1">Roles</span>
+                    <span class="text-xs text-gray-400">Estructura modular reutilizable que organiza tareas, variables y plantillas Jinja2.</span>
+                </div>
+                <div class="bg-black/40 p-3 rounded-lg border border-ansible-border">
+                    <span class="text-xs font-bold text-ansible-accent block mb-1">Tasks</span>
+                    <span class="text-xs text-gray-400">Acción individual mínima que invoca un módulo con parámetros específicos.</span>
+                </div>
+                <div class="bg-black/40 p-3 rounded-lg border border-ansible-border">
+                    <span class="text-xs font-bold text-ansible-accent block mb-1">Plugins</span>
+                    <span class="text-xs text-gray-400">Extensiones para adaptar ejecución, logs, inventarios dinámicos y conexiones.</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: FLUJO REAL DE USO -->
+        <section class="slide flex-col p-8 overflow-y-auto slide-content">
+            <h2 class="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+                <i class="fa-solid fa-diagram-project text-ansible-red"></i> 2. Flujo Real de Uso en Ansible
+            </h2>
+            <p class="text-gray-400 text-sm mb-6">Principios de ejecución sin agentes, declarativa e idempotente</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 my-auto">
+                <div class="bg-ansible-card p-6 rounded-xl border border-ansible-border relative">
+                    <div class="text-3xl font-extrabold text-ansible-red mb-2">01</div>
+                    <h3 class="text-lg font-bold text-white mb-2">Arquitectura Agentless</h3>
+                    <p class="text-sm text-gray-300">No requiere instalar ningún software cliente ni demonios en los servidores destino. Se conecta utilizando únicamente <strong>SSH</strong> (Linux/Unix) o <strong>WinRM</strong> (Windows).</p>
+                </div>
+                <div class="bg-ansible-card p-6 rounded-xl border border-ansible-border relative">
+                    <div class="text-3xl font-extrabold text-ansible-red mb-2">02</div>
+                    <h3 class="text-lg font-bold text-white mb-2">Ejecución Declarativa</h3>
+                    <p class="text-sm text-gray-300">Tú describes <em>qué</em> estado deseas alcanzar (ej: "Nginx debe estar instalado y corriendo"), no <em>cómo</em> programar los comandos paso a paso.</p>
+                </div>
+                <div class="bg-ansible-card p-6 rounded-xl border border-ansible-border relative">
+                    <div class="text-3xl font-extrabold text-ansible-red mb-2">03</div>
+                    <h3 class="text-lg font-bold text-white mb-2">Idempotencia Garantizada</h3>
+                    <p class="text-sm text-gray-300">Ejecutar el mismo Playbook 1 o 100 veces produce el mismo resultado exacto. Si el sistema ya está en el estado deseado, Ansible no realiza cambios innecesarios.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: CASOS DE USO PRINCIPALES -->
+        <section class="slide flex-col p-8 overflow-y-auto slide-content">
+            <h2 class="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+                <i class="fa-solid fa-list-check text-ansible-red"></i> 3. Casos de Uso Principales
+            </h2>
+            <p class="text-gray-400 text-sm mb-6">Escenarios reales de aplicación en la industria</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-ansible-card p-5 rounded-xl border border-ansible-border flex gap-4">
+                    <div class="text-ansible-red text-3xl"><i class="fa-solid fa-server"></i></div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">1. Gestión de Configuración de Servidores</h3>
+                        <p class="text-xs text-gray-300 mt-1">Estandarización de paquetes, usuarios, llaves SSH, archivos de configuración (p. ej. `/etc/nginx/nginx.conf`) en cientos de instancias simultáneamente.</p>
+                    </div>
+                </div>
+                <div class="bg-ansible-card p-5 rounded-xl border border-ansible-border flex gap-4">
+                    <div class="text-ansible-red text-3xl"><i class="fa-solid fa-cloud"></i></div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">2. Aprovisionamiento Multicloud</h3>
+                        <p class="text-xs text-gray-300 mt-1">Creación y orquestación de recursos en AWS (EC2, S3), Azure, GCP, DigitalOcean y entornos VMware/vSphere desde una única herramienta.</p>
+                    </div>
+                </div>
+                <div class="bg-ansible-card p-5 rounded-xl border border-ansible-border flex gap-4">
+                    <div class="text-ansible-red text-3xl"><i class="fa-solid fa-rocket"></i></div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">3. Despliegue de Aplicaciones</h3>
+                        <p class="text-xs text-gray-300 mt-1">Automatización del ciclo de vida de software: clonado de Git, construcción de imágenes Docker, actualización de bases de datos y reinicio de servicios sin downtime.</p>
+                    </div>
+                </div>
+                <div class="bg-ansible-card p-5 rounded-xl border border-ansible-border flex gap-4">
+                    <div class="text-ansible-red text-3xl"><i class="fa-solid fa-shield-halved"></i></div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">4. Parches de Seguridad y Cumplimiento</h3>
+                        <p class="text-xs text-gray-300 mt-1">Aplicación automatizada de parches del sistema operativo (Zero-day vulnerabilities) y auditoría contínua de hardening de seguridad (CIS Benchmarks).</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: INTEGRACIÓN CON ECOSISTEMA DEL CURSO (ACTUALIZADO SEGÚN LOS 4 PDF) -->
+        <section class="slide flex-col p-8 overflow-y-auto slide-content">
+            <h2 class="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+                <i class="fa-solid fa-graduation-cap text-ansible-red"></i> 4. Integración con el Ecosistema del Curso
+            </h2>
+            <p class="text-gray-400 text-sm mb-4">Alineación con Configuration Management, Modern DevOps, Containers y GitOps</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                <!-- CM & Areas Funcionales -->
+                <div class="bg-ansible-card p-4 rounded-lg border border-ansible-border">
+                    <span class="font-bold text-ansible-accent flex items-center gap-2 mb-1">
+                        <i class="fa-solid fa-sliders"></i> Configuration Management (CM)
+                    </span>
+                    <p class="text-gray-300 leading-relaxed">
+                        Ansible cubre las 6 áreas funcionales del curso: automatiza <strong>Environment Configuration</strong> (variables por dev/test/prod), <strong>Build & Release Engineering</strong>, y garantiza un <strong>Deployment</strong> trazable y seguro mediante <strong>Change Control</strong> auditables.
+                    </p>
+                </div>
+
+                <!-- Modern DevOps, IaC y CaC -->
+                <div class="bg-ansible-card p-4 rounded-lg border border-ansible-border">
+                    <span class="font-bold text-ansible-accent flex items-center gap-2 mb-1">
+                        <i class="fa-solid fa-code"></i> Modern DevOps (IaC & CaC)
+                    </span>
+                    <p class="text-gray-300 leading-relaxed">
+                        Materializa el paso de DevOps Tradicional a Modern DevOps: reemplaza configuraciones manuales por <strong>Infrastructure as Code (IaC)</strong> y <strong>Configuration as Code (CaC)</strong>, eliminando la automatización hecha a mano.
+                    </p>
+                </div>
+
+                <!-- Containers & Matrix of Hell -->
+                <div class="bg-ansible-card p-4 rounded-lg border border-ansible-border">
+                    <span class="font-bold text-ansible-accent flex items-center gap-2 mb-1">
+                        <i class="fa-brands fa-docker"></i> Contenedores & Cloud-Native
+                    </span>
+                    <p class="text-gray-300 leading-relaxed">
+                        Resuelve la <em>"Matrix of Hell"</em> provisionando automáticamente nodos Linux/Docker runtime, preparando el entorno para orquestadores como Kubernetes y acelerando pipelines CI/CD.
+                    </p>
+                </div>
+
+                <!-- GitOps & SCM -->
+                <div class="bg-ansible-card p-4 rounded-lg border border-ansible-border">
+                    <span class="font-bold text-ansible-accent flex items-center gap-2 mb-1">
+                        <i class="fa-brands fa-git-alt"></i> GitOps & Source Code Management
+                    </span>
+                    <p class="text-gray-300 leading-relaxed">
+                        Los Playbooks viven en Git como la **única fuente de verdad** (SCM). Cada modificación se versiona (`git commit`/`push`), permitiendo ejecuciones automatizadas y rollback auditables.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Flujo de Artefactos -->
+            <div class="mt-4 p-4 bg-black/50 rounded-xl border border-ansible-border">
+                <h4 class="text-xs font-bold text-white mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-box-open text-ansible-red"></i> Artefactos Producidos y Consumidos en el Pipeline
+                </h4>
+                <div class="flex justify-around text-xs">
+                    <div>
+                        <span class="text-emerald-400 font-semibold block">Artefactos Consumidos (Inputs):</span>
+                        <ul class="list-disc list-inside text-gray-400">
+                            <li>Código fuente / Playbooks YAML en Git</li>
+                            <li>Inventarios estáticos/dinámicos (Cloud API)</li>
+                            <li>Variables de entorno & Secretos (Ansible Vault)</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <span class="text-ansible-accent font-semibold block">Artefactos Producidos (Outputs):</span>
+                        <ul class="list-disc list-inside text-gray-400">
+                            <li>Infraestructura estandarizada e immutable</li>
+                            <li>Reportes de auditoría y paridad de entorno</li>
+                            <li>Logs de ejecución (OK / Changed / Failed)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 7: ARQUITECTURA / DIAGRAMA -->
+        <section class="slide flex-col p-8 overflow-y-auto slide-content">
+            <h2 class="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+                <i class="fa-solid fa-sitemap text-ansible-red"></i> 5. Arquitectura y Diagrama de Flujo
+            </h2>
+            <p class="text-gray-400 text-sm mb-6">Modelo de funcionamiento interno de Ansible Engine</p>
+
+            <div class="bg-ansible-card p-6 rounded-xl border border-ansible-border flex flex-col items-center justify-center my-auto">
+                <svg viewBox="0 0 800 300" class="w-full max-w-3xl h-auto">
+                    <!-- ENTRADAS -->
+                    <rect x="20" y="30" width="160" height="60" rx="8" fill="#1E1E1E" stroke="#EE0000" stroke-width="2"/>
+                    <text x="100" y="65" fill="#FFF" font-size="14" text-anchor="middle" font-weight="bold">Playbooks (YAML)</text>
+                    
+                    <rect x="20" y="120" width="160" height="60" rx="8" fill="#1E1E1E" stroke="#EE0000" stroke-width="2"/>
+                    <text x="100" y="155" fill="#FFF" font-size="14" text-anchor="middle" font-weight="bold">Inventory (IPs/Tags)</text>
+
+                    <rect x="20" y="210" width="160" height="60" rx="8" fill="#1E1E1E" stroke="#EE0000" stroke-width="2"/>
+                    <text x="100" y="245" fill="#FFF" font-size="14" text-anchor="middle" font-weight="bold">Ansible Vault</text>
+
+                    <!-- FLECHAS 1 -->
+                    <path d="M 180 60 L 260 150" stroke="#FF4D4D" stroke-width="2" marker-end="url(#arrow)"/>
+                    <path d="M 180 150 L 260 150" stroke="#FF4D4D" stroke-width="2" marker-end="url(#arrow)"/>
+                    <path d="M 180 240 L 260 150" stroke="#FF4D4D" stroke-width="2" marker-end="url(#arrow)"/>
+
+                    <!-- PROCESO CENTRAL -->
+                    <rect x="260" y="90" width="220" height="120" rx="12" fill="#252525" stroke="#444" stroke-width="2"/>
+                    <text x="370" y="130" fill="#EE0000" font-size="16" text-anchor="middle" font-weight="bold">Ansible Control Node</text>
+                    <text x="370" y="155" fill="#AAA" font-size="12" text-anchor="middle">(Ejecución de Módulos Python)</text>
+                    <text x="370" y="180" fill="#AAA" font-size="11" text-anchor="middle">Sintaxis & Idempotencia</text>
+
+                    <!-- FLECHAS 2 (SSH) -->
+                    <path d="M 480 150 L 580 60" stroke="#10B981" stroke-width="2" stroke-dasharray="4" marker-end="url(#arrow)"/>
+                    <text x="530" y="95" fill="#10B981" font-size="10" text-anchor="middle">SSH / WinRM</text>
+
+                    <path d="M 480 150 L 580 150" stroke="#10B981" stroke-width="2" stroke-dasharray="4" marker-end="url(#arrow)"/>
+                    <text x="530" y="140" fill="#10B981" font-size="10" text-anchor="middle">SSH / API</text>
+
+                    <path d="M 480 150 L 580 240" stroke="#10B981" stroke-width="2" stroke-dasharray="4" marker-end="url(#arrow)"/>
+                    <text x="530" y="210" fill="#10B981" font-size="10" text-anchor="middle">Cloud API</text>
+
+                    <!-- SALIDAS -->
+                    <rect x="580" y="30" width="180" height="60" rx="8" fill="#1E1E1E" stroke="#10B981" stroke-width="2"/>
+                    <text x="670" y="65" fill="#FFF" font-size="13" text-anchor="middle">Linux / Web Server</text>
+
+                    <rect x="580" y="120" width="180" height="60" rx="8" fill="#1E1E1E" stroke="#10B981" stroke-width="2"/>
+                    <text x="670" y="155" fill="#FFF" font-size="13" text-anchor="middle">Docker Host / K8s</text>
+
+                    <rect x="580" y="210" width="180" height="60" rx="8" fill="#1E1E1E" stroke="#10B981" stroke-width="2"/>
+                    <text x="670" y="245" fill="#FFF" font-size="13" text-anchor="middle">AWS / Azure / GCP</text>
+
+                    <defs>
+                        <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#FF4D4D" />
+                        </marker>
+                    </defs>
+                </svg>
+            </div>
+        </section>
+
+        <!-- SLIDE 8: EJEMPLO PRÁCTICO MÍNIMO -->
+        <section class="slide flex-col p-8 overflow-y-auto slide-content">
+            <h2 class="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+                <i class="fa-solid fa-code text-ansible-red"></i> 6. Ejemplo Práctico Mínimo
+            </h2>
+            <p class="text-gray-400 text-sm mb-4">Estructura de Proyecto y Playbook para Despliegue y Configuración de Servidor Web Nginx</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                <!-- Code Panel 1: Inventory & Structure -->
+                <div>
+                    <span class="text-gray-400 font-bold block mb-1">Estructura del Proyecto & Inventario (`hosts.ini`)</span>
+                    <pre class="code-block p-4 rounded-lg text-gray-200 overflow-x-auto">
+Ansible_Demo/
+├── inventory/
+│   └── hosts.ini
+├── templates/
+│   └── index.html.j2
+├── playbook.yml
+└── README.md
+
+<span class="text-gray-500"># inventory/hosts.ini</span>
+[webservers]
+<span class="text-gray-500"># Modo Local (demo en vivo en WSL/Linux):</span>
+localhost ansible_connection=local
+
+<span class="text-gray-500"># Modo Remoto (SSH agentless en producción):</span>
+<span class="text-gray-500"># server1 ansible_host=192.168.1.50 ansible_user=ubuntu</span>
+</pre>
+                </div>
+
+                <!-- Code Panel 2: Playbook -->
+                <div>
+                    <span class="text-gray-400 font-bold block mb-1">Playbook Principal (`playbook.yml`)</span>
+                    <pre class="code-block p-4 rounded-lg text-gray-200 overflow-x-auto">
+<span class="text-ansible-accent">---</span>
+- <span class="text-blue-400">name</span>: Despliegue y Configuración de Nginx
+  <span class="text-blue-400">hosts</span>: webservers
+  <span class="text-blue-400">become</span>: true
+
+  <span class="text-blue-400">vars</span>:
+    <span class="text-gray-300">app_version</span>: <span class="text-yellow-300">"1.0.0"</span>
+
+  <span class="text-blue-400">tasks</span>:
+    - <span class="text-blue-400">name</span>: 1. Instalar servidor Nginx
+      <span class="text-emerald-400">apt</span>:
+        <span class="text-gray-300">name</span>: nginx
+        <span class="text-gray-300">state</span>: present
+        <span class="text-gray-300">update_cache</span>: true
+
+    - <span class="text-blue-400">name</span>: 2. Desplegar plantilla Jinja2
+      <span class="text-emerald-400">template</span>:
+        <span class="text-gray-300">src</span>: templates/index.html.j2
+        <span class="text-gray-300">dest</span>: /var/www/html/index.html
+        <span class="text-gray-300">mode</span>: <span class="text-yellow-300">'0644'</span>
+      <span class="text-blue-400">notify</span>: Reiniciar Nginx
+
+    - <span class="text-blue-400">name</span>: 3. Asegurar servicio activo
+      <span class="text-emerald-400">service</span>:
+        <span class="text-gray-300">name</span>: nginx
+        <span class="text-gray-300">state</span>: started
+        <span class="text-gray-300">enabled</span>: true
+
+  <span class="text-blue-400">handlers</span>:
+    - <span class="text-blue-400">name</span>: Reiniciar Nginx
+      <span class="text-emerald-400">service</span>:
+        <span class="text-gray-300">name</span>: nginx
+        <span class="text-gray-300">state</span>: restarted
+</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 9: PASO A PASO DEL EJEMPLO -->
+        <section class="slide flex-col p-8 overflow-y-auto slide-content">
+            <h2 class="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+                <i class="fa-solid fa-terminal text-ansible-red"></i> 7. Paso a Paso para Ejecución
+            </h2>
+            <p class="text-gray-400 text-sm mb-4">Comandos y secuencia de verificación en terminal</p>
+
+            <div class="space-y-4 text-xs">
+                <div class="bg-ansible-card p-4 rounded-lg border border-ansible-border">
+                    <span class="font-bold text-ansible-accent block mb-1">Paso 1: Probar Conectividad (Ping SSH)</span>
+                    <p class="text-gray-400 mb-2">Verifica que Ansible pueda conectarse al servidor remoto antes de ejecutar tareas.</p>
+                    <pre class="code-block p-2 rounded text-gray-200">ansible webservers -i inventory/hosts.ini -m ping</pre>
+                </div>
+
+                <div class="bg-ansible-card p-4 rounded-lg border border-ansible-border">
+                    <span class="font-bold text-ansible-accent block mb-1">Paso 2: Simulación de Cambios (Dry-Run / Check Mode)</span>
+                    <p class="text-gray-400 mb-2">Evalúa qué cambios se realizarían sin modificar realmente el servidor.</p>
+                    <pre class="code-block p-2 rounded text-gray-200">ansible-playbook -i inventory/hosts.ini playbook.yml --check</pre>
+                </div>
+
+                <div class="bg-ansible-card p-4 rounded-lg border border-ansible-border">
+                    <span class="font-bold text-ansible-accent block mb-1">Paso 3: Ejecución Real del Playbook</span>
+                    <p class="text-gray-400 mb-2">Aplica el estado deseado: instala Nginx, renderiza la plantilla HTML y activa el servicio.</p>
+                    <pre class="code-block p-2 rounded text-gray-200">ansible-playbook -i inventory/hosts.ini playbook.yml</pre>
+                </div>
+
+                <div class="bg-ansible-card p-4 rounded-lg border border-emerald-900/40">
+                    <span class="font-bold text-emerald-400 block mb-1">Paso 4 (En Vivo): Idempotencia y Autocuración (Self-Healing)</span>
+                    <p class="text-gray-400 mb-2">Reejecutar para comprobar <strong class="text-white">Idempotencia</strong> (<code class="text-emerald-400">changed=0</code>) o simular caída con <code class="text-yellow-400">sudo service nginx stop</code> para ver cómo Ansible repara el error humano automáticamente.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 10: COMPARACIÓN CON ALTERNATIVAS -->
+        <section class="slide flex-col p-8 overflow-y-auto slide-content">
+            <h2 class="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+                <i class="fa-solid fa-code-compare text-ansible-red"></i> 8. Comparación con Alternativas
+            </h2>
+            <p class="text-gray-400 text-sm mb-4">Cuadro comparativo frente a otras herramientas del ecosistema IaC</p>
+
+            <div class="overflow-x-auto my-auto">
+                <table class="w-full text-xs text-left border-collapse">
+                    <thead>
+                        <tr class="bg-ansible-red/20 text-white border-b border-ansible-border">
+                            <th class="p-3">Criterio</th>
+                            <th class="p-3 font-bold text-ansible-accent">Ansible</th>
+                            <th class="p-3">Terraform</th>
+                            <th class="p-3">Puppet / Chef</th>
+                            <th class="p-3">SaltStack</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-ansible-border text-gray-300">
+                        <tr>
+                            <td class="p-3 font-semibold text-white">Arquitectura</td>
+                            <td class="p-3 text-emerald-400 font-bold">Agentless (SSH)</td>
+                            <td class="p-3">Agentless (API)</td>
+                            <td class="p-3 text-red-400">Basada en Agentes</td>
+                            <td class="p-3">Agente / Agentless</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 font-semibold text-white">Lenguaje / Sintaxis</td>
+                            <td class="p-3">YAML (Sencillo)</td>
+                            <td class="p-3">HCL (HashiCorp)</td>
+                            <td class="p-3">DSL Propietario / Ruby</td>
+                            <td class="p-3">YAML + Python</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 font-semibold text-white">Foco Principal</td>
+                            <td class="p-3 text-white">Gestión de Configuración & Apps</td>
+                            <td class="p-3">Aprovisionamiento de Infraestructura Cloud</td>
+                            <td class="p-3">Gestión de Configuración Estática</td>
+                            <td class="p-3">Ejecución remota masiva y rápida</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 font-semibold text-white">Curva de Aprendizaje</td>
+                            <td class="p-3 text-emerald-400 font-bold">Baja / Muy Fácil</td>
+                            <td class="p-3">Media</td>
+                            <td class="p-3 text-red-400">Alta</td>
+                            <td class="p-3">Media - Alta</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SLIDE 11: VENTAJAS Y DESVENTAJAS -->
+        <section class="slide flex-col p-8 overflow-y-auto slide-content">
+            <h2 class="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+                <i class="fa-solid fa-scale-balanced text-ansible-red"></i> 9. Ventajas y Desventajas (Análisis Matricial)
+            </h2>
+            <p class="text-gray-400 text-sm mb-4">Evaluación técnica integral para adopción empresarial</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-auto">
+                <!-- Ventajas -->
+                <div class="bg-ansible-card p-5 rounded-xl border border-emerald-900/40">
+                    <h3 class="text-emerald-400 font-bold mb-3 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-circle-check"></i> Ventajas Clave
+                    </h3>
+                    <ul class="space-y-2 text-xs text-gray-300">
+                        <li><strong class="text-white">Costo:</strong> Gratuito y Open Source en su versión Core.</li>
+                        <li><strong class="text-white">Sin Agentes:</strong> Menos consumo de memoria y CPU en nodos remotos; no hay agentes para actualizar.</li>
+                        <li><strong class="text-white">Curva de Aprendizaje:</strong> Sintaxis YAML limpia e intuitiva para SysAdmins y Devs.</li>
+                        <li><strong class="text-white">Comunidad:</strong> Enorme biblioteca de roles listos en Ansible Galaxy.</li>
+                        <li><strong class="text-white">Seguridad:</strong> Usa autenticación SSH existente y cifrado via Ansible Vault.</li>
+                    </ul>
+                </div>
+
+                <!-- Desventajas -->
+                <div class="bg-ansible-card p-5 rounded-xl border border-red-900/40">
+                    <h3 class="text-ansible-accent font-bold mb-3 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-circle-xmark"></i> Desventajas & Limitaciones
+                    </h3>
+                    <ul class="space-y-2 text-xs text-gray-300">
+                        <li><strong class="text-white">Velocidad de Ejecución:</strong> Puede ser más lento que soluciones basadas en agentes (p. ej. SaltStack) en miles de nodos.</li>
+                        <li><strong class="text-white">Gestión de Estado:</strong> No guarda un archivo de estado global centralizado como Terraform (`.tfstate`).</li>
+                        <li><strong class="text-white">Complejidad YAML:</strong> Tabulaciones e identación estrictas pueden causar errores sutiles de sintaxis.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 12: BUENAS PRÁCTICAS -->
+        <section class="slide flex-col p-8 overflow-y-auto slide-content">
+            <h2 class="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+                <i class="fa-solid fa-star text-ansible-red"></i> 10. Buenas Prácticas
+            </h2>
+            <p class="text-gray-400 text-sm mb-6">Recomendaciones para mantener código limpio y seguro</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-auto">
+                <div class="bg-ansible-card p-4 rounded-xl border border-ansible-border">
+                    <i class="fa-solid fa-key text-ansible-red text-xl mb-2"></i>
+                    <h3 class="text-sm font-bold text-white mb-1">Uso de Ansible Vault</h3>
+                    <p class="text-xs text-gray-400">Cifrar siempre contraseñas, tokens y llaves privadas dentro del repositorio Git.</p>
+                </div>
+                <div class="bg-ansible-card p-4 rounded-xl border border-ansible-border">
+                    <i class="fa-solid fa-folder-tree text-ansible-red text-xl mb-2"></i>
+                    <h3 class="text-sm font-bold text-white mb-1">Estructura Modular (Roles)</h3>
+                    <p class="text-xs text-gray-400">Dividir Playbooks grandes en Roles independientes (tasks, handlers, vars, templates).</p>
+                </div>
+                <div class="bg-ansible-card p-4 rounded-xl border border-ansible-border">
+                    <i class="fa-solid fa-vial text-ansible-red text-xl mb-2"></i>
+                    <h3 class="text-sm font-bold text-white mb-1">Testing & Dry-Run</h3>
+                    <p class="text-xs text-gray-400">Probar Playbooks usando `--check` y herramientas como Molecule y ansible-lint antes de aplicar en producción.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 13: RIESGOS Y ERRORES COMUNES -->
+        <section class="slide flex-col p-8 overflow-y-auto slide-content">
+            <h2 class="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+                <i class="fa-solid fa-bug text-ansible-red"></i> 11. Riesgos y Errores Comunes
+            </h2>
+            <p class="text-gray-400 text-sm mb-6">Trampas operativas y cómo evitarlas</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs my-auto">
+                <div class="bg-ansible-card p-4 rounded-lg border border-ansible-border flex items-start gap-3">
+                    <i class="fa-solid fa-triangle-exclamation text-yellow-500 text-lg mt-1"></i>
+                    <div>
+                        <h4 class="font-bold text-white mb-1">Sensibilidad a Indentación en YAML</h4>
+                        <p class="text-gray-400">Un espacio adicional o mal alineado provocará fallos crípticos durante el parsing.</p>
+                    </div>
+                </div>
+                <div class="bg-ansible-card p-4 rounded-lg border border-ansible-border flex items-start gap-3">
+                    <i class="fa-solid fa-triangle-exclamation text-yellow-500 text-lg mt-1"></i>
+                    <div>
+                        <h4 class="font-bold text-white mb-1">Uso Excesivo de Módulos Shell/Command</h4>
+                        <p class="text-gray-400">Ejecutar comandos Bash directamente rompe la idempotencia. Debe preferirse el uso de módulos nativos.</p>
+                    </div>
+                </div>
+                <div class="bg-ansible-card p-4 rounded-lg border border-ansible-border flex items-start gap-3">
+                    <i class="fa-solid fa-triangle-exclamation text-yellow-500 text-lg mt-1"></i>
+                    <div>
+                        <h4 class="font-bold text-white mb-1">Timeouts y Timeouts SSH</h4>
+                        <p class="text-gray-400">En redes de alta latencia o despliegues masivos, las conexiones SSH no optimizadas pueden expirar prematuramente.</p>
+                    </div>
+                </div>
+                <div class="bg-ansible-card p-4 rounded-lg border border-ansible-border flex items-start gap-3">
+                    <i class="fa-solid fa-triangle-exclamation text-yellow-500 text-lg mt-1"></i>
+                    <div>
+                        <h4 class="font-bold text-white mb-1">Hardcoding de Variables</h4>
+                        <p class="text-gray-400">Escribir direcciones IP o credenciales directamente en los Playbooks en lugar de usar variables o inventarios dinámicos.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 14: CONCLUSIONES Y CRITERIO PROFESIONAL -->
+        <section class="slide flex-col p-8 overflow-y-auto slide-content">
+            <h2 class="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+                <i class="fa-solid fa-clipboard-check text-ansible-red"></i> 12. Conclusiones y Criterio Profesional
+            </h2>
+            <p class="text-gray-400 text-sm mb-4">¿Cuándo sí y cuándo no usar Ansible?</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs mb-4">
+                <div class="bg-ansible-card p-4 rounded-lg border border-emerald-900/50">
+                    <span class="font-bold text-emerald-400 text-sm block mb-1">¿Cuándo SÍ usarlo?</span>
+                    <p class="text-gray-300">Para automatizar la configuración interna de OS, orquestar despliegues híbridos, estandarizar servidores existentes y proyectos que requieren despliegue rápido sin infraestructura compleja de gestión.</p>
+                </div>
+                <div class="bg-ansible-card p-4 rounded-lg border border-red-900/50">
+                    <span class="font-bold text-ansible-accent text-sm block mb-1">¿Cuándo NO usarlo?</span>
+                    <p class="text-gray-300">Para aprovisionar pura infraestructura en la nube desde cero (Terraform es mejor para esto) o en sistemas 100% serverless sin servidores ni OS que administrar.</p>
+                </div>
+            </div>
+
+            <div class="bg-black/50 p-4 rounded-xl border border-ansible-border text-xs">
+                <h4 class="font-bold text-white mb-2">Recomendación por Tamaño de Empresa</h4>
+                <div class="grid grid-cols-3 gap-2 text-center">
+                    <div class="p-2 bg-ansible-card rounded border border-ansible-border">
+                        <span class="text-ansible-accent font-bold block">Proyecto Pequeño</span>
+                        <span class="text-gray-400">Ansible Core CLI (Sencillo y gratis).</span>
+                    </div>
+                    <div class="p-2 bg-ansible-card rounded border border-ansible-border">
+                        <span class="text-ansible-accent font-bold block">Empresa Mediana</span>
+                        <span class="text-gray-400">Ansible + AWX (UI Open Source).</span>
+                    </div>
+                    <div class="p-2 bg-ansible-card rounded border border-ansible-border">
+                        <span class="text-ansible-accent font-bold block">Enterprise</span>
+                        <span class="text-gray-400">Red Hat Ansible Automation Platform.</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Control Bar -->
+    <footer class="h-16 bg-ansible-dark border-t border-ansible-border px-6 flex items-center justify-between">
+        <button id="prev-btn" class="px-4 py-2 bg-ansible-card hover:bg-neutral-800 text-white rounded-lg text-sm font-medium border border-ansible-border transition flex items-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed">
+            <i class="fa-solid fa-arrow-left"></i> Anterior
+        </button>
+
+        <!-- Progress Bar Container -->
+        <div class="w-1/3 bg-neutral-800 h-2 rounded-full overflow-hidden">
+            <div id="progress-bar" class="bg-ansible-red h-full w-1/14 transition-all duration-300"></div>
+        </div>
+
+        <button id="next-btn" class="px-4 py-2 bg-ansible-red hover:bg-ansible-accent text-white rounded-lg text-sm font-medium transition flex items-center gap-2">
+            Siguiente <i class="fa-solid fa-arrow-right"></i>
+        </button>
+    </footer>
+
+    <!-- Interactive Navigation Script -->
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const currentSlideEl = document.getElementById('current-slide');
+        const totalSlidesEl = document.getElementById('total-slides');
+        const progressBar = document.getElementById('progress-bar');
+
+        let currentIndex = 0;
+        const totalSlides = slides.length;
+        totalSlidesEl.textContent = totalSlides;
+
+        function updateSlide(index) {
+            slides.forEach((slide, idx) => {
+                slide.classList.toggle('active', idx === index);
+            });
+
+            currentSlideEl.textContent = index + 1;
+            progressBar.style.width = `${((index + 1) / totalSlides) * 100}%`;
+
+            prevBtn.disabled = index === 0;
+            if (index === totalSlides - 1) {
+                nextBtn.innerHTML = `Inicio <i class="fa-solid fa-rotate-right"></i>`;
+            } else {
+                nextBtn.innerHTML = `Siguiente <i class="fa-solid fa-arrow-right"></i>`;
+            }
+        }
+
+        prevBtn.addEventListener('click', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateSlide(currentIndex);
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentIndex < totalSlides - 1) {
+                currentIndex++;
+            } else {
+                currentIndex = 0;
+            }
+            updateSlide(currentIndex);
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'Space') {
+                if (currentIndex < totalSlides - 1) {
+                    currentIndex++;
+                    updateSlide(currentIndex);
+                }
+            } else if (e.key === 'ArrowLeft') {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    updateSlide(currentIndex);
+                }
+            }
+        });
+
+        // Initialize
+        updateSlide(currentIndex);
+    </script>
+</body>
+</html>
